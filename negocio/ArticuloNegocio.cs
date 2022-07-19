@@ -53,7 +53,26 @@ namespace negocio
             }
         }
 
-        public void agregar(Articulo nuevo) { }
+        public void agregar(Articulo nuevo) 
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta("Insert into ARTICULOS (Codigo, Nombre, Descripcion)values('" + nuevo.Codigo + "','" + nuevo.Nombre + "','" + nuevo.Descripcion + "')");
+                datos.ejecutarAccion();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
         public void modificar(Articulo modificar) { }
     }
 }

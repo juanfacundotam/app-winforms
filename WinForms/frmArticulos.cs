@@ -52,5 +52,11 @@ namespace WinForms
                 pbxArticulo.Load("https://www.bunzlspain.com/media/catalog/product/placeholder/default/product-placeholder_2.gif");
             }
         }
+
+        private void btnAgregar_Click(object sender, EventArgs e)
+        {
+            frmAltaArticulo alta = new frmAltaArticulo();
+            alta.ShowDialog();
+        }
     }
 }

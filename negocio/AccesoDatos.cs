@@ -45,6 +45,22 @@ namespace negocio
             }
         }
 
+        public void ejecutarAccion() //Hay que crear este metodo porque no es lectura, sino insert
+        {
+            comando.Connection = conexion;
+            try
+            {
+                conexion.Open();
+                comando.ExecuteNonQuery(); //A diferencia de la de lectura, esta no tiene lector
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
         public void cerrarConexion()
         {
             if (lector != null)
