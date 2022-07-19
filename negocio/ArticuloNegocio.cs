@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient; //nos permitira crear los objetos: SqlConnection, SqlCommand, SqlDataReader
+using dominio;
 
-namespace WinForms
+namespace negocio
 {
-    internal class ArticuloNegocio  //Aquí haremos los metodos
+    public class ArticuloNegocio  //Aquí haremos los metodos
     {
         public List<Articulo> listar()
         {
@@ -20,7 +21,7 @@ namespace WinForms
             {
                 conexion.ConnectionString = "server=.\\SQLEXPRESS; database=CATALOGO_DB; integrated security=true";
                 comando.CommandType = System.Data.CommandType.Text;
-                comando.CommandText = "Select Codigo, Nombre, Descripcion, ImagenUrl From ARTICULOS";
+                comando.CommandText = "Select Codigo, Nombre, A.Descripcion, M.Descripcion Marca, C.Descripcion Categoria, ImagenUrl, Precio From ARTICULOS A, CATEGORIAS C, MARCAS M where M.Id = A.IdMarca and C.Id = A.IdCategoria";
                 comando.Connection = conexion; // diremos que el comando escrito se almacene acá.
 
                 conexion.Open();
@@ -33,6 +34,11 @@ namespace WinForms
                     aux.Nombre = (string)lector["Nombre"];
                     aux.Descripcion = (string)lector["Descripcion"];
                     aux.ImagenUrl = (string)lector["ImagenUrl"];
+                    aux.Precio = lector.GetDecimal(6);
+                    aux.Marca = new Marca();
+                    aux.Marca.Descripcion = (string)lector["Marca"];
+                    aux.Categoria = new Categoria();
+                    aux.Categoria.Descripcion = (string)lector["Categoria"];
 
                     lista.Add(aux);
                 }
@@ -46,5 +52,8 @@ namespace WinForms
                 throw ex;
             }
         }
+
+        public void agregar(Articulo nuevo) { }
+        public void modificar(Articulo modificar) { }
     }
 }

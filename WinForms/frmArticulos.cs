@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using dominio;
+using negocio;
 
 namespace WinForms
 {
@@ -23,6 +25,7 @@ namespace WinForms
             ArticuloNegocio negocio = new ArticuloNegocio();
             listaArticulo = negocio.listar();
             dgvArticulos.DataSource = listaArticulo;
+            dgvArticulos.Columns["ImagenUrl"].Visible = false;
             cargarImagen(listaArticulo[0].ImagenUrl);
         }
 
@@ -30,6 +33,11 @@ namespace WinForms
         {
             Articulo seleccionado = (Articulo)dgvArticulos.CurrentRow.DataBoundItem;
             cargarImagen(seleccionado.ImagenUrl);
+
+            Marca marca = new Marca();
+            marca.ToString();
+            Categoria categoria = new Categoria();
+            categoria.ToString();
         }
 
         private void cargarImagen(string imagen)
