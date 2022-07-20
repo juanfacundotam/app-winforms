@@ -22,11 +22,7 @@ namespace WinForms
 
         private void frmArticulos_Load(object sender, EventArgs e)
         {
-            ArticuloNegocio negocio = new ArticuloNegocio();
-            listaArticulo = negocio.listar();
-            dgvArticulos.DataSource = listaArticulo;
-            dgvArticulos.Columns["ImagenUrl"].Visible = false;
-            cargarImagen(listaArticulo[0].ImagenUrl);
+            cargar();
         }
 
         private void dgvArticulos_SelectionChanged(object sender, EventArgs e)
@@ -34,10 +30,27 @@ namespace WinForms
             Articulo seleccionado = (Articulo)dgvArticulos.CurrentRow.DataBoundItem;
             cargarImagen(seleccionado.ImagenUrl);
 
-            Marca marca = new Marca();
-            marca.ToString();
-            Categoria categoria = new Categoria();
-            categoria.ToString();
+            //Marca marca = new Marca();
+            //marca.ToString();
+            //Categoria categoria = new Categoria();
+            //categoria.ToString();
+        }
+
+        private void cargar()
+        {
+            ArticuloNegocio negocio = new ArticuloNegocio();
+            try
+            {
+                listaArticulo = negocio.listar();
+                dgvArticulos.DataSource = listaArticulo;
+                dgvArticulos.Columns["ImagenUrl"].Visible = false;
+                cargarImagen(listaArticulo[0].ImagenUrl);
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void cargarImagen(string imagen)
@@ -57,6 +70,7 @@ namespace WinForms
         {
             frmAltaArticulo alta = new frmAltaArticulo();
             alta.ShowDialog();
+            cargar();
         }
     }
 }

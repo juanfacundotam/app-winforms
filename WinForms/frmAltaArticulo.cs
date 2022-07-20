@@ -33,6 +33,10 @@ namespace WinForms
                 art.Codigo = txtCodigo.Text;
                 art.Nombre = txtNombre.Text;
                 art.Descripcion = txtDescripcion.Text;
+                art.ImagenUrl = txtImagen.Text;
+                art.Marca = (Marca)cboMarca.SelectedItem;
+                art.Categoria = (Categoria)cboCategoria.SelectedItem;
+                art.Precio = decimal.Parse(txtPrecio.Text);
 
                 negocio.agregar(art);
                 MessageBox.Show("Agregado exitosamente");
@@ -42,6 +46,40 @@ namespace WinForms
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private void frmAltaArticulo_Load(object sender, EventArgs e)
+        {
+            MarcaNegocio marcaNegocio = new MarcaNegocio();
+            CategoriaNegocio categoriaNegocio = new CategoriaNegocio();
+
+            try
+            {
+                cboMarca.DataSource = marcaNegocio.listar();
+                cboCategoria.DataSource = categoriaNegocio.listar();
+            }
+            catch (Exception ex)
+            { 
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void cargarImagen(string imagen)
+        {
+            try
+            {
+
+                pbxArticulo.Load(imagen);
+            }
+            catch (Exception ex)
+            {
+                pbxArticulo.Load("https://www.bunzlspain.com/media/catalog/product/placeholder/default/product-placeholder_2.gif");
+            }
+        }
+
+        private void txtImagen_Leave(object sender, EventArgs e)
+        {
+            cargarImagen(txtImagen.Text);
         }
     }
 }

@@ -33,8 +33,12 @@ namespace negocio
                     aux.Codigo = (string)lector["Codigo"];      //Acá ponemos las propiedades que se van a mapear.
                     aux.Nombre = (string)lector["Nombre"];
                     aux.Descripcion = (string)lector["Descripcion"];
-                    aux.ImagenUrl = (string)lector["ImagenUrl"];
-                    aux.Precio = lector.GetDecimal(6);
+                    //if(!(lector.IsDBNull(lector.GetOrdinal("ImagenUrl"))))
+                    //    aux.ImagenUrl = (string)lector["ImagenUrl"];
+                    if (!(lector["ImagenUrl"] is DBNull))
+                        aux.ImagenUrl = (string)lector["ImagenUrl"];
+                    if (!(lector["Precio"] is DBNull))
+                        aux.Precio = lector.GetDecimal(6);
                     aux.Marca = new Marca();
                     aux.Marca.Descripcion = (string)lector["Marca"];
                     aux.Categoria = new Categoria();
@@ -59,7 +63,11 @@ namespace negocio
 
             try
             {
-                datos.setearConsulta("Insert into ARTICULOS (Codigo, Nombre, Descripcion)values('" + nuevo.Codigo + "','" + nuevo.Nombre + "','" + nuevo.Descripcion + "')");
+                datos.setearConsulta("Insert into ARTICULOS (Codigo, Nombre, Descripcion, IdMarca, IdCategoria, ImagenUrl, Precio)values('" + nuevo.Codigo + "','" + nuevo.Nombre + "','" + nuevo.Descripcion + "', @idMarca, @idCategoria, @imagenUrl, @precio)");
+                datos.setearParametro("@idMarca", nuevo.Marca.Id);
+                datos.setearParametro("@idCategoria", nuevo.Categoria.Id);
+                datos.setearParametro("@imagenUrl", nuevo.ImagenUrl);
+                datos.setearParametro("@precio", nuevo.Precio);
                 datos.ejecutarAccion();
             }
             catch (Exception)
