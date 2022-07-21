@@ -14,9 +14,17 @@ namespace WinForms
 {
     public partial class frmAltaArticulo : Form
     {
+        private Articulo articulo = null;
         public frmAltaArticulo()
         {
             InitializeComponent();
+        }
+
+        public frmAltaArticulo(Articulo articulo)
+        {
+            InitializeComponent();
+            this.articulo = articulo;
+            Text = "Modificar Artículo";
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
@@ -26,20 +34,33 @@ namespace WinForms
 
         private void btnAceptar_Click(object sender, EventArgs e)
         {
-            Articulo art = new Articulo();
+            
             ArticuloNegocio negocio = new ArticuloNegocio();
             try
             {
-                art.Codigo = txtCodigo.Text;
-                art.Nombre = txtNombre.Text;
-                art.Descripcion = txtDescripcion.Text;
-                art.ImagenUrl = txtImagen.Text;
-                art.Marca = (Marca)cboMarca.SelectedItem;
-                art.Categoria = (Categoria)cboCategoria.SelectedItem;
-                art.Precio = decimal.Parse(txtPrecio.Text);
+                if (articulo  == null)
+                    articulo = new Articulo();
 
-                negocio.agregar(art);
-                MessageBox.Show("Agregado exitosamente");
+                articulo.Nombre = txtNombre.Text;
+                articulo.Descripcion = txtDescripcion.Text;
+                articulo.Codigo = txtCodigo.Text;
+                articulo.ImagenUrl = txtImagen.Text;
+                articulo.Marca = (Marca)cboMarca.SelectedItem;
+                articulo.Categoria = (Categoria)cboCategoria.SelectedItem;
+                articulo.Precio = decimal.Parse(txtPrecio.Text);
+                
+                if (articulo.Id != 0)
+                {
+                    negocio.modificar(articulo);
+                    MessageBox.Show("Modificado exitosamente");
+                }
+                else
+                {
+                    negocio.agregar(articulo);
+                    MessageBox.Show("Agregado exitosamente");
+                }
+
+
                 Close();
             }
             catch (Exception ex)
@@ -56,7 +77,24 @@ namespace WinForms
             try
             {
                 cboMarca.DataSource = marcaNegocio.listar();
+                cboMarca.ValueMember = "Id";
+                cboMarca.DisplayMember = "Descripcion";
                 cboCategoria.DataSource = categoriaNegocio.listar();
+                cboCategoria.ValueMember = "Id";
+                cboCategoria.DisplayMember = "Descripcion";
+
+                if (articulo != null)
+                {
+                    txtCodigo.Text = articulo.Codigo;
+                    txtNombre.Text = articulo.Nombre;
+                    txtDescripcion.Text = articulo.Descripcion;
+                    txtImagen.Text = articulo.ImagenUrl;
+                    txtPrecio.Text = articulo.Precio.ToString();
+                    cargarImagen(articulo.ImagenUrl);
+                    cboMarca.SelectedValue = articulo.Marca.Id;
+                    cboCategoria.SelectedValue = articulo.Categoria.Id;
+
+                }
             }
             catch (Exception ex)
             { 

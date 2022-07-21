@@ -21,7 +21,7 @@ namespace negocio
             {
                 conexion.ConnectionString = "server=.\\SQLEXPRESS; database=CATALOGO_DB; integrated security=true";
                 comando.CommandType = System.Data.CommandType.Text;
-                comando.CommandText = "Select Codigo, Nombre, A.Descripcion, M.Descripcion Marca, C.Descripcion Categoria, ImagenUrl, Precio From ARTICULOS A, CATEGORIAS C, MARCAS M where M.Id = A.IdMarca and C.Id = A.IdCategoria";
+                comando.CommandText = "Select Codigo, Nombre, A.Descripcion, M.Descripcion Marca, C.Descripcion Categoria, ImagenUrl, Precio, IdMarca, IdCategoria, A.Id From ARTICULOS A, CATEGORIAS C, MARCAS M where M.Id = A.IdMarca and C.Id = A.IdCategoria";
                 comando.Connection = conexion; // diremos que el comando escrito se almacene acá.
 
                 conexion.Open();
@@ -30,6 +30,7 @@ namespace negocio
                 while (lector.Read())
                 {
                     Articulo aux = new Articulo();
+                    aux.Id = (int)lector["Id"];
                     aux.Codigo = (string)lector["Codigo"];      //Acá ponemos las propiedades que se van a mapear.
                     aux.Nombre = (string)lector["Nombre"];
                     aux.Descripcion = (string)lector["Descripcion"];
@@ -40,8 +41,10 @@ namespace negocio
                     if (!(lector["Precio"] is DBNull))
                         aux.Precio = lector.GetDecimal(6);
                     aux.Marca = new Marca();
+                    aux.Marca.Id = (int)lector["IdMarca"];
                     aux.Marca.Descripcion = (string)lector["Marca"];
                     aux.Categoria = new Categoria();
+                    aux.Categoria.Id = (int)lector["IdCategoria"];
                     aux.Categoria.Descripcion = (string)lector["Categoria"];
 
                     lista.Add(aux);
@@ -81,6 +84,50 @@ namespace negocio
             }
         }
 
-        public void modificar(Articulo modificar) { }
+        public void modificar(Articulo art)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setearConsulta("update ARTICULOS set Codigo = @codigo, Nombre = @nombre, Descripcion = @descripcion, IdMarca = @idMarca, IdCategoria = @idCategoria, ImagenUrl = @imagen, Precio = @precio where Id = @id");
+                datos.setearParametro("@nombre", art.Nombre);
+                datos.setearParametro("@codigo", art.Codigo);
+                datos.setearParametro("@descripcion", art.Descripcion);
+                datos.setearParametro("@idMarca", art.Marca.Id);
+                datos.setearParametro("@idCategoria", art.Categoria.Id);
+                datos.setearParametro("@imagen", art.ImagenUrl);
+                datos.setearParametro("@precio", art.Precio);
+                datos.setearParametro("@id", art.Id);
+
+                datos.ejecutarAccion();
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            finally 
+            {
+                datos.cerrarConexion();            
+            }
+        }
+
+        public void eliminar(int id)
+        {
+            try
+            {
+                AccesoDatos datos = new AccesoDatos();
+                datos.setearConsulta("Delete from ARTICULOS where Id = @id");
+                datos.setearParametro("@id", id);
+                datos.ejecutarAccion();
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
     }
 }

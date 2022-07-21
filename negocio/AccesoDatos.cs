@@ -52,11 +52,9 @@ namespace negocio
             {
                 conexion.Open();
                 comando.ExecuteNonQuery(); //A diferencia de la de lectura, esta no tiene lector
-
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
