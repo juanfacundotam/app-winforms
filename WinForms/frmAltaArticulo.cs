@@ -62,19 +62,9 @@ namespace WinForms
                 articulo.Marca = (Marca)cboMarca.SelectedItem;
                 articulo.Categoria = (Categoria)cboCategoria.SelectedItem;
 
-                
-                if (txtPrecio.Text != "")                                        //para validar si no se ingresa precio
-                    articulo.Precio = decimal.Parse(txtPrecio.Text);
 
-                
-                if (articulo.Id == 0)           // Lo puse solo para que valide en la vuelta de agregar, porque sino hago eso, en modificar me va a tirar siempre el mensaje de ponga solo numeros, incluso cuando dejo el valor que habia agregado
-                {
-                    if (!(soloNumeros(txtPrecio.Text)))
-                    {
-                        MessageBox.Show("En el campo de precio solo se aceptan números");
-                        return;
-                    }
-                }
+                if (txtPrecio.Text != "")                                        //para validar si no se ingresa precio 
+                    articulo.Precio = decimal.Parse(txtPrecio.Text);
 
 
 
@@ -163,6 +153,16 @@ namespace WinForms
 
                 //guardar la imagen
                 //File.Copy(archivo.FileName, ConfigurationManager.AppSettings["images-folder"] + archivo.SafeFileName);      //Comentamos esto porque queremos que no copie la imagen solo cuando damos aceptar, no apenas la seleccionamos
+            }
+        }
+
+        private void txtPrecio_KeyPress(object sender, KeyPressEventArgs e)  //Validacion del campo de Precio en Agregar y Modificar
+        {
+            if((e.KeyChar >= 32 && e.KeyChar <= 43) || (e.KeyChar >= 45 && e.KeyChar <= 47) || (e.KeyChar >= 58 && e.KeyChar <= 255))
+            {
+                MessageBox.Show("Ingrese solo números", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                e.Handled = true;
+                return;
             }
         }
     }
