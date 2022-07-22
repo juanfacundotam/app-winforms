@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using dominio;
 using negocio;
+using System.Configuration;
 
 namespace WinForms
 {
     public partial class frmAltaArticulo : Form
     {
         private Articulo articulo = null;
+        private OpenFileDialog archivo = null;
         public frmAltaArticulo()
         {
             InitializeComponent();
@@ -32,6 +35,17 @@ namespace WinForms
             Close();
         }
 
+        private bool soloNumeros(string cadena) // Para validar Precio
+        {
+            foreach (char caracter in cadena)
+            {
+                if (!(char.IsNumber(caracter)))
+                    return false;
+            }
+            return true;
+        }
+
+
         private void btnAceptar_Click(object sender, EventArgs e)
         {
             
@@ -47,8 +61,23 @@ namespace WinForms
                 articulo.ImagenUrl = txtImagen.Text;
                 articulo.Marca = (Marca)cboMarca.SelectedItem;
                 articulo.Categoria = (Categoria)cboCategoria.SelectedItem;
-                articulo.Precio = decimal.Parse(txtPrecio.Text);
+
                 
+                if (txtPrecio.Text != "")                                        //para validar si no se ingresa precio
+                    articulo.Precio = decimal.Parse(txtPrecio.Text);
+
+                
+                if (articulo.Id == 0)           // Lo puse solo para que valide en la vuelta de agregar, porque sino hago eso, en modificar me va a tirar siempre el mensaje de ponga solo numeros, incluso cuando dejo el valor que habia agregado
+                {
+                    if (!(soloNumeros(txtPrecio.Text)))
+                    {
+                        MessageBox.Show("En el campo de precio solo se aceptan números");
+                        return;
+                    }
+                }
+
+
+
                 if (articulo.Id != 0)
                 {
                     negocio.modificar(articulo);
@@ -56,10 +85,13 @@ namespace WinForms
                 }
                 else
                 {
+
                     negocio.agregar(articulo);
                     MessageBox.Show("Agregado exitosamente");
                 }
 
+                if(archivo !=null && !(txtImagen.Text.ToUpper().Contains("HTTP")))
+                    File.Copy(archivo.FileName, ConfigurationManager.AppSettings["images-folder"] + archivo.SafeFileName);
 
                 Close();
             }
@@ -89,7 +121,7 @@ namespace WinForms
                     txtNombre.Text = articulo.Nombre;
                     txtDescripcion.Text = articulo.Descripcion;
                     txtImagen.Text = articulo.ImagenUrl;
-                    txtPrecio.Text = articulo.Precio.ToString();
+                    txtPrecio.Text = (articulo.Precio.ToString());
                     cargarImagen(articulo.ImagenUrl);
                     cboMarca.SelectedValue = articulo.Marca.Id;
                     cboCategoria.SelectedValue = articulo.Categoria.Id;
@@ -118,6 +150,20 @@ namespace WinForms
         private void txtImagen_Leave(object sender, EventArgs e)
         {
             cargarImagen(txtImagen.Text);
+        }
+
+        private void btnAgregarImagen_Click(object sender, EventArgs e)
+        {
+            archivo = new OpenFileDialog();
+            archivo.Filter = "jpg|*.jpg|png|*.png";
+            if(archivo.ShowDialog() == DialogResult.OK)
+            {
+                txtImagen.Text = archivo.FileName;
+                cargarImagen(archivo.FileName);
+
+                //guardar la imagen
+                //File.Copy(archivo.FileName, ConfigurationManager.AppSettings["images-folder"] + archivo.SafeFileName);      //Comentamos esto porque queremos que no copie la imagen solo cuando damos aceptar, no apenas la seleccionamos
+            }
         }
     }
 }

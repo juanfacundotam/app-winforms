@@ -38,8 +38,10 @@ namespace negocio
                     //    aux.ImagenUrl = (string)lector["ImagenUrl"];
                     if (!(lector["ImagenUrl"] is DBNull))
                         aux.ImagenUrl = (string)lector["ImagenUrl"];
+
+                    //aux.Precio = lector.GetDecimal(6);
                     if (!(lector["Precio"] is DBNull))
-                        aux.Precio = lector.GetDecimal(6);
+                        aux.Precio = (decimal)lector["Precio"];
                     aux.Marca = new Marca();
                     aux.Marca.Id = (int)lector["IdMarca"];
                     aux.Marca.Descripcion = (string)lector["Marca"];
@@ -111,6 +113,99 @@ namespace negocio
             {
                 datos.cerrarConexion();            
             }
+        }
+
+        public List<Articulo> filtrar(string campo, string criterio, string filtro)
+        {
+            List<Articulo> lista =  new List<Articulo>();
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                string consulta = "Select Codigo, Nombre, A.Descripcion, M.Descripcion Marca, C.Descripcion Categoria, ImagenUrl, Precio, IdMarca, IdCategoria, A.Id From ARTICULOS A, CATEGORIAS C, MARCAS M where M.Id = A.IdMarca and C.Id = A.IdCategoria and ";
+                if(campo == "Precio")
+                {
+                    switch (criterio)
+                    {
+                        case "Mayor que":
+                            consulta += "Precio > " + filtro;
+                            break;
+                        case "Menor que":
+                            consulta += "Precio < " + filtro;
+                            break;
+                        default:
+                            consulta += "Precio = " + filtro;
+                            break;
+                    }
+                }
+                else if (campo == "Nombre")
+                {
+                    switch (criterio)
+                    {
+                        case "Comienza con":
+                            consulta += "Nombre like '" + filtro + "%' ";
+                            break;
+                        case "Termina con":
+                            consulta += "Nombre like '%" + filtro + "'";
+                            break;
+                        default:
+                            consulta += "Nombre like '%" + filtro + "%'";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (criterio)
+                    {
+                        case "Comienza con":
+                            consulta += "A.Descripcion like '" + filtro + "%' ";
+                            break;
+                        case "Termina con":
+                            consulta += "A.Descripcion like '%" + filtro + "'";
+                            break;
+                        default:
+                            consulta += "A.Descripcion like '%" + filtro + "%'";
+                            break;
+                    }
+                }
+
+                datos.setearConsulta(consulta);
+                datos.ejecutarLectura();
+
+
+                while (datos.Lector.Read())
+                {
+                    Articulo aux = new Articulo();
+                    aux.Id = (int)datos.Lector["Id"];
+                    aux.Codigo = (string)datos.Lector["Codigo"];      //Acá ponemos las propiedades que se van a mapear.
+                    aux.Nombre = (string)datos.Lector["Nombre"];
+                    aux.Descripcion = (string)datos.Lector["Descripcion"];
+                    //if(!(lector.IsDBNull(lector.GetOrdinal("ImagenUrl"))))
+                    //    aux.ImagenUrl = (string)lector["ImagenUrl"];
+                    if (!(datos.Lector["ImagenUrl"] is DBNull))
+                        aux.ImagenUrl = (string)datos.Lector["ImagenUrl"];
+                    if (!(datos.Lector["Precio"] is DBNull))
+                        aux.Precio = datos.Lector.GetDecimal(6);
+                    aux.Marca = new Marca();
+                    aux.Marca.Id = (int)datos.Lector["IdMarca"];
+                    aux.Marca.Descripcion = (string)datos.Lector["Marca"];
+                    aux.Categoria = new Categoria();
+                    aux.Categoria.Id = (int)datos.Lector["IdCategoria"];
+                    aux.Categoria.Descripcion = (string)datos.Lector["Categoria"];
+
+                    lista.Add(aux);
+                }
+
+                
+                return lista;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+            
         }
 
         public void eliminar(int id)
